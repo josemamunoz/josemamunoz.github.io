@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jose Manuel Muñoz — Data Analyst · Minería & Datos · Chile</title>
+<style>
+/* ─── TOKENS (LIGHT MODE) ────────────────────────────────────── */
+:root {
+  --coal:    #F6F8FA;
+  --slate:   #FFFFFF;
+  --panel:   #EEF2F6;
+  --border:  #D0D7DE;
+  --copper:  #A0612A;
+  --copper2: #B8692E;
+  --copper3: #954F18;
+  --cyan:    #0969DA;
+  --green:   #1A7F37;
+  --purple:  #8250DF;
+  --text:    #1F2328;
+  --muted:   #57606A;
+  --dimmed:  #BCC3CB;
+
+  /* Dark tokens kept for terminal/code blocks */
+  --term-bg:     #0D1117;
+  --term-slate:  #161B22;
+  --term-panel:  #1C2333;
+  --term-border: #30363D;
+  --term-text:   #E6EDF3;
+  --term-muted:  #8B949E;
+  --term-dimmed: #484F58;
+}
+
+/* ─── RESET ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+       background: var(--coal); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+
+/* ─── SCROLLBAR ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--panel); }
+::-webkit-scrollbar-thumb { background: var(--copper); border-radius: 3px; }
+
+/* ─── NAV ────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; width: 100%; z-index: 100;
+  background: rgba(246,248,250,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between; height: 56px;
+}
+.nav-logo {
+  font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.logo-bracket { color: var(--copper); }
+.logo-name    { color: var(--text); }
+.logo-cursor  { display: inline-block; width: 8px; height: 14px;
+                background: var(--copper2); animation: blink 1.2s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.nav-links { display: flex; gap: 0.2rem; list-style: none; }
+.nav-links a {
+  color: var(--muted); text-decoration: none; font-size: 0.78rem;
+  padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.15s;
+  letter-spacing: 0.03em;
+}
+.nav-links a:hover { color: var(--copper); background: rgba(160,97,42,0.08); }
+.nav-links a span { color: var(--copper); margin-right: 2px; }
+
+/* ─── HERO ───────────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh; padding: 100px 2rem 4rem;
+  display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  background: var(--slate);
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 70% 50%, rgba(160,97,42,0.07) 0%, transparent 70%),
+              radial-gradient(ellipse 40% 60% at 20% 80%, rgba(9,105,218,0.05) 0%, transparent 60%);
+}
+.grid-overlay {
+  position: absolute; inset: 0; opacity: 0.06;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.hero-inner {
+  max-width: 1100px; margin: 0 auto; position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr 480px; gap: 4rem; align-items: center;
+}
+
+/* Terminal header */
+.term-header {
+  display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;
+}
+.term-dot { width: 12px; height: 12px; border-radius: 50%; }
+.td-red   { background: #FF5F57; }
+.td-yellow{ background: #FEBC2E; }
+.td-green { background: #28C840; }
+.term-title {
+  margin-left: 0.5rem; font-size: 0.72rem; color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.hero-eyebrow {
+  font-size: 0.75rem; color: var(--copper); letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 0.8rem;
+}
+.hero-eyebrow::before { content: "// "; color: var(--dimmed); }
+
+.hero h1 {
+  font-size: 2.6rem; font-weight: 800; line-height: 1.12; margin-bottom: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.hero h1 .line1 { color: var(--text); display: block; }
+.hero h1 .line2 { color: var(--copper); display: block; }
+.hero h1 .line3 { color: var(--muted); font-size: 1.6rem; font-weight: 600; display: block; }
+
+.hero-bio {
+  color: var(--muted); font-size: 0.88rem; line-height: 1.75;
+  margin-bottom: 1.8rem; max-width: 500px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.hero-bio .hl { color: var(--text); font-weight: 600; }
+.hero-bio .cu { color: var(--copper); font-weight: 500; }
+
+.hero-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
+.pill {
+  background: rgba(160,97,42,0.08); border: 1px solid rgba(160,97,42,0.22);
+  color: var(--copper); padding: 0.25rem 0.7rem; border-radius: 4px;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em;
+  transition: all 0.15s;
+}
+.pill:hover { background: rgba(160,97,42,0.14); border-color: var(--copper); }
+.pill-cyan  { background: rgba(9,105,218,0.07); border-color: rgba(9,105,218,0.22); color: var(--cyan); }
+.pill-cyan:hover { background: rgba(9,105,218,0.13); border-color: var(--cyan); }
+.pill-green { background: rgba(26,127,55,0.07); border-color: rgba(26,127,55,0.22); color: var(--green); }
+
+.hero-cta { display: flex; gap: 0.8rem; }
+.btn {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
+  padding: 0.65rem 1.4rem; border-radius: 6px; text-decoration: none;
+  transition: all 0.15s; display: inline-flex; align-items: center; gap: 0.4rem;
+  border: 1px solid transparent;
+}
+.btn-copper {
+  background: var(--copper); color: #FFFFFF; border-color: var(--copper);
+}
+.btn-copper:hover { background: var(--copper2); border-color: var(--copper2); transform: translateY(-1px); }
+.btn-ghost {
+  background: transparent; color: var(--muted); border-color: var(--border);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--muted); background: var(--panel); }
+
+/* ─── HERO RIGHT: LIVE CHART ─────────────────────────────────── */
+.chart-panel {
+  background: var(--slate); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.2rem; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(31,35,40,0.06), 0 4px 16px rgba(31,35,40,0.04);
+}
+.chart-panel-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;
+}
+.chart-panel-title { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; }
+.live-badge {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.65rem; color: var(--green); letter-spacing: 0.06em;
+}
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.8); }
+}
+canvas#heroChart { width: 100% !important; }
+
+.chart-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1rem;
+}
+.chart-stat {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center;
+}
+.chart-stat-val { font-size: 1rem; font-weight: 800; color: var(--copper); }
+.chart-stat-lbl { font-size: 0.62rem; color: var(--muted); margin-top: 0.1rem;
+                  font-family: -apple-system, sans-serif; }
+
+/* ─── SECTION BASE ───────────────────────────────────────────── */
+section { padding: 5rem 2rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-header { margin-bottom: 3rem; }
+.section-eyebrow {
+  font-size: 0.72rem; color: var(--copper); letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.section-eyebrow::before { content: "// "; color: var(--dimmed); }
+.section-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.8rem; font-weight: 800; color: var(--text); margin-bottom: 0.4rem;
+}
+.section-sub {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.9rem; color: var(--muted); max-width: 560px;
+}
+
+/* ─── PROJECTS ───────────────────────────────────────────────── */
+#proyectos { background: var(--coal); border-top: 1px solid var(--border); }
+.projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+.project-card {
+  background: var(--slate); border: 1px solid var(--border); border-radius: 10px;
+  padding: 1.4rem; display: flex; flex-direction: column;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  position: relative; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(31,35,40,0.04);
+}
+.project-card::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--copper), transparent);
+  opacity: 0; transition: opacity 0.2s;
+}
+.project-card:hover {
+  border-color: var(--copper); transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(160,97,42,0.12);
+}
+.project-card:hover::before { opacity: 1; }
+
+.proj-lang {
+  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 1rem;
+}
+.lang-dot { width: 10px; height: 10px; border-radius: 50%; }
+.lang-python  { background: #3572A5; }
+.lang-sql     { background: #E38C00; }
+.lang-powerbi { background: #F2C811; }
+
+.proj-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem;
+}
+.proj-desc {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.82rem; color: var(--muted); line-height: 1.65; flex: 1; margin-bottom: 1rem;
+}
+.proj-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1rem; }
+.proj-tag {
+  background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); font-size: 0.67rem; padding: 0.15rem 0.5rem;
+  border-radius: 20px; letter-spacing: 0.04em;
+}
+.proj-link {
+  font-size: 0.75rem; color: var(--cyan); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.3rem; margin-top: auto;
+  transition: color 0.15s;
+}
+.proj-link:hover { color: var(--copper); }
+
+/* Code snippet in project — stays dark */
+.proj-code {
+  background: var(--term-bg); border: 1px solid var(--term-border); border-radius: 6px;
+  padding: 0.7rem 0.8rem; font-size: 0.68rem; color: var(--term-muted);
+  margin-bottom: 0.8rem; overflow-x: auto; white-space: pre; line-height: 1.6;
+  border-left: 2px solid var(--copper);
+}
+.kw  { color: #FF7B72; }
+.fn  { color: #79C0FF; }
+.str { color: #A5D6FF; }
+.cm  { color: var(--term-dimmed); }
+.nu  { color: #F0A050; }
+
+/* ─── TERMINAL SECTION ───────────────────────────────────────── */
+#pipeline { border-top: 1px solid var(--border); background: var(--slate); }
+.terminal-window {
+  background: var(--term-slate); border: 1px solid var(--term-border); border-radius: 10px;
+  overflow: hidden; max-width: 760px; margin: 0 auto;
+  box-shadow: 0 4px 24px rgba(31,35,40,0.12);
+}
+.term-bar {
+  background: var(--term-panel); padding: 0.7rem 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid var(--term-border);
+}
+.term-body {
+  padding: 1.2rem 1.4rem; font-size: 0.8rem; line-height: 1.9;
+  color: var(--term-muted);
+}
+.term-line { display: flex; gap: 0.8rem; }
+.term-prompt { color: var(--copper2); flex-shrink: 0; }
+.term-cmd    { color: var(--term-text); }
+.term-out    { color: var(--term-muted); padding-left: 1.6rem; }
+.term-ok     { color: #3FB950; }
+.term-warn   { color: #F0A050; }
+.term-section { color: #58A6FF; font-weight: 700; }
+.term-spacer { height: 0.4rem; }
+
+/* ─── SKILLS ─────────────────────────────────────────────────── */
+#skills { background: var(--coal); border-top: 1px solid var(--border); }
+.skills-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.skill-group { margin-bottom: 0; }
+.skill-group-title {
+  font-size: 0.72rem; color: var(--copper); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 1.2rem;
+}
+.skill-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.8rem; gap: 1rem;
+}
+.skill-name-wrap { display: flex; align-items: center; gap: 0.6rem; min-width: 140px; }
+.skill-name {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.85rem; color: var(--text);
+}
+.skill-bar-track {
+  flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+}
+.skill-bar-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, var(--copper), var(--copper2));
+  width: 0; transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+.skill-bar-fill.cyan  { background: linear-gradient(90deg, #1D4ED8, var(--cyan)); }
+.skill-bar-fill.green { background: linear-gradient(90deg, #166534, var(--green)); }
+.skill-pct { font-size: 0.72rem; color: var(--muted); min-width: 28px; text-align: right; }
+
+/* ─── EXPERIENCE ─────────────────────────────────────────────── */
+#experiencia { border-top: 1px solid var(--border); background: var(--slate); }
+.exp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.exp-card {
+  background: var(--coal); border: 1px solid var(--border); border-radius: 10px;
+  padding: 1.4rem; position: relative; overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.exp-card:hover {
+  border-color: rgba(160,97,42,0.4);
+  box-shadow: 0 4px 16px rgba(160,97,42,0.08);
+}
+.exp-card.featured {
+  border-color: rgba(160,97,42,0.3);
+  background: linear-gradient(135deg, var(--coal) 0%, rgba(160,97,42,0.04) 100%);
+}
+.exp-period { font-size: 0.7rem; color: var(--copper); letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+.exp-role {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem;
+}
+.exp-company {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.82rem; color: var(--muted); margin-bottom: 0.8rem;
+}
+.exp-company .company-hl { color: var(--copper); font-weight: 600; }
+.exp-points {
+  list-style: none; display: flex; flex-direction: column; gap: 0.3rem;
+}
+.exp-points li {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.8rem; color: var(--muted); padding-left: 1rem; position: relative;
+  line-height: 1.55;
+}
+.exp-points li::before { content: "▸"; position: absolute; left: 0; color: var(--copper); }
+.exp-badge {
+  position: absolute; top: 1rem; right: 1rem;
+  background: rgba(160,97,42,0.1); border: 1px solid rgba(160,97,42,0.25);
+  color: var(--copper); font-size: 0.62rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ─── CONTACT ────────────────────────────────────────────────── */
+#contacto { background: var(--coal); border-top: 1px solid var(--border); }
+.contact-inner { max-width: 640px; margin: 0 auto; text-align: center; }
+.contact-ascii {
+  font-size: 0.65rem; line-height: 1.3; color: rgba(160,97,42,0.22);
+  letter-spacing: 0.05em; margin-bottom: 2rem; user-select: none;
+}
+.contact-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.8rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem;
+}
+.contact-sub {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem;
+}
+.contact-links { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.contact-link {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 1.4rem; border-radius: 6px; font-size: 0.8rem;
+  font-weight: 600; text-decoration: none; border: 1px solid var(--border);
+  color: var(--muted); transition: all 0.15s; letter-spacing: 0.03em;
+  font-family: 'SF Mono', 'Fira Code', monospace; background: var(--slate);
+}
+.contact-link:hover { color: var(--copper); border-color: var(--copper); background: rgba(160,97,42,0.06); }
+.contact-link.primary { background: var(--copper); color: #FFFFFF; border-color: var(--copper); }
+.contact-link.primary:hover { background: var(--copper2); border-color: var(--copper2); }
+
+/* ─── FOOTER ─────────────────────────────────────────────────── */
+footer {
+  background: var(--slate); border-top: 1px solid var(--border);
+  padding: 1.2rem 2rem; text-align: center;
+  font-size: 0.72rem; color: var(--dimmed); letter-spacing: 0.04em;
+}
+footer span { color: var(--copper); }
+
+/* ─── ANIMATIONS ─────────────────────────────────────────────── */
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .chart-panel { display: none; }
+  .hero h1 { font-size: 1.9rem; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .skills-layout { grid-template-columns: 1fr; }
+  .exp-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <span class="logo-bracket">[</span>
+      <span class="logo-name">josemamunoz</span>
+      <span class="logo-bracket">]</span>
+      <span class="logo-cursor"></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#proyectos"><span>01.</span>proyectos</a></li>
+      <li><a href="#pipeline"><span>02.</span>pipeline</a></li>
+      <li><a href="#skills"><span>03.</span>skills</a></li>
+      <li><a href="#experiencia"><span>04.</span>experiencia</a></li>
+      <li><a href="#contacto"><span>05.</span>contacto</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="grid-overlay"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="term-header">
+        <div class="term-dot td-red"></div>
+        <div class="term-dot td-yellow"></div>
+        <div class="term-dot td-green"></div>
+        <span class="term-title">josemamunoz ~ portfolio.py</span>
+      </div>
+      <p class="hero-eyebrow">data analyst · minería · sectores regulados</p>
+      <h1>
+        <span class="line1">Ingeniero que</span>
+        <span class="line2">habla datos.</span>
+        <span class="line3">Desde el terreno hasta el dashboard.</span>
+      </h1>
+      <p class="hero-bio">
+        Llevo <span class="hl">7+ años</span> transformando datos en decisiones.
+        Empecé supervisando sensores de monitoreo ambiental en
+        <span class="cu">División Ministro Hales, Codelco</span> —
+        donde aprendí que el dato malo tiene consecuencias reales.
+        Hoy construyo pipelines ETL, data warehouses y dashboards BI
+        para que las gerencias decidan con información, no intuición.
+      </p>
+      <div class="hero-pills">
+        <span class="pill">Power BI</span>
+        <span class="pill">SQL</span>
+        <span class="pill">Python</span>
+        <span class="pill">Snowflake</span>
+        <span class="pill">ETL</span>
+        <span class="pill pill-cyan">DuckDB</span>
+        <span class="pill pill-cyan">SAP</span>
+        <span class="pill pill-green">NCG 519</span>
+        <span class="pill pill-green">RCA</span>
+      </div>
+      <div class="hero-cta">
+        <a href="#proyectos" class="btn btn-copper">→ ver proyectos</a>
+        <a href="https://github.com/josemamunoz" class="btn btn-ghost" target="_blank">github ↗</a>
+        <a href="https://www.linkedin.com/in/josemamunoz/" class="btn btn-ghost" target="_blank">linkedin ↗</a>
+      </div>
+    </div>
+
+    <div class="chart-panel">
+      <div class="chart-panel-header">
+        <span class="chart-panel-title">PRODUCCIÓN COBRE CHILE · ktm</span>
+        <span class="live-badge"><span class="live-dot"></span>CODELCO vs PRIVADOS</span>
+      </div>
+      <canvas id="heroChart" height="200"></canvas>
+      <div class="chart-stats">
+        <div class="chart-stat">
+          <div class="chart-stat-val">4.1M</div>
+          <div class="chart-stat-lbl">ton métricas 2023</div>
+        </div>
+        <div class="chart-stat">
+          <div class="chart-stat-val">28%</div>
+          <div class="chart-stat-lbl">del cobre mundial</div>
+        </div>
+        <div class="chart-stat">
+          <div class="chart-stat-val">12</div>
+          <div class="chart-stat-lbl">minas analizadas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROJECTS ──────────────────────────────────────────────────── -->
+<section id="proyectos">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <p class="section-eyebrow">portafolio</p>
+      <h2 class="section-title">Proyectos</h2>
+      <p class="section-sub">Pipelines y análisis reales sobre datos del sector minero y ambiental chileno.</p>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card fade-in">
+        <div class="proj-lang">
+          <div class="lang-dot lang-python"></div><span style="font-size:0.7rem;color:var(--muted)">Python</span>
+          <div class="lang-dot lang-sql" style="margin-left:0.5rem"></div><span style="font-size:0.7rem;color:var(--muted)">SQL</span>
+        </div>
+        <div class="proj-title">Análisis Producción Minera Chile · 1995–2023</div>
+        <p class="proj-desc">Pipeline ETL end-to-end sobre producción histórica de cobre. Extrae, transforma y carga a DuckDB. 7 queries SQL analíticas: market share, impacto COVID, correlación precio/producción.</p>
+        <div class="proj-code"><span class="cm">-- market share por mina</span>
+<span class="kw">SELECT</span> mine,
+  <span class="fn">ROUND</span>(SUM(production_ktm)*<span class="nu">100.0</span>
+    /SUM(SUM(production_ktm)) <span class="kw">OVER</span>(),<span class="nu">1</span>)
+  <span class="kw">AS</span> share_pct
+<span class="kw">FROM</span> copper_production
+<span class="kw">GROUP BY</span> mine</div>
+        <div class="proj-tags">
+          <span class="proj-tag">Python</span><span class="proj-tag">Pandas</span>
+          <span class="proj-tag">DuckDB</span><span class="proj-tag">SQL</span>
+          <span class="proj-tag">Matplotlib</span><span class="proj-tag">Seaborn</span>
+        </div>
+        <a class="proj-link" href="https://github.com/josemamunoz/chile-copper-analysis" target="_blank">ver repositorio →</a>
+      </div>
+
+      <div class="project-card fade-in">
+        <div class="proj-lang">
+          <div class="lang-dot lang-python"></div><span style="font-size:0.7rem;color:var(--muted)">Python</span>
+          <div class="lang-dot" style="background:#4CAF50;margin-left:0.5rem"></div><span style="font-size:0.7rem;color:var(--muted)">ETL</span>
+        </div>
+        <div class="proj-title">Pipeline ETL · Monitoreo Ambiental RCA</div>
+        <p class="proj-desc">Replica el procesamiento de sensores de campo bajo RCA: pH, turbidez, arsénico. Arquitectura staging → mart → compliance, con detección automática de excedencias normativas (NCh1333, DS 90).</p>
+        <div class="proj-code"><span class="cm"># capas dbt-style</span>
+EXTRACT  sensors(pH, turb, As, SO4)
+  ↓
+<span class="fn">stg_sensor_readings</span>     <span class="cm"># clean</span>
+  ↓
+<span class="fn">mart_monthly_compliance</span> <span class="cm"># norms</span>
+  ↓
+DuckDB warehouse <span class="str">→</span> report</div>
+        <div class="proj-tags">
+          <span class="proj-tag">Python</span><span class="proj-tag">Pandas</span>
+          <span class="proj-tag">DuckDB</span><span class="proj-tag">ETL</span>
+          <span class="proj-tag">NCh1333</span><span class="proj-tag">RCA</span>
+        </div>
+        <a class="proj-link" href="https://github.com/josemamunoz/etl-pipeline-ambiental" target="_blank">ver repositorio →</a>
+      </div>
+
+      <div class="project-card fade-in" style="border-style:dashed;opacity:0.6;cursor:default;">
+        <div class="proj-lang">
+          <div class="lang-dot lang-powerbi"></div><span style="font-size:0.7rem;color:var(--muted)">Power BI</span>
+          <div class="lang-dot" style="background:#0EA5E9;margin-left:0.5rem"></div><span style="font-size:0.7rem;color:var(--muted)">SAP</span>
+        </div>
+        <div class="proj-title">Dashboard Planificación · Control Producción</div>
+        <p class="proj-desc">Dashboard gerencial conectado a SAP: KPIs de capacidad, cumplimiento de plazos y alertas de desvío. ETL SAP → Power Query → modelo DAX optimizado. Datos reales anonimizados.</p>
+        <div class="proj-code"><span class="cm">// DAX — KPI cumplimiento</span>
+Cumplimiento% =
+  <span class="fn">DIVIDE</span>(
+    <span class="fn">CALCULATE</span>([Ordenes_OK],
+      Estado = <span class="str">"Cerrada"</span>),
+    [Total_Ordenes]
+  ) * <span class="nu">100</span></div>
+        <div class="proj-tags">
+          <span class="proj-tag">Power BI</span><span class="proj-tag">DAX</span>
+          <span class="proj-tag">SAP</span><span class="proj-tag">Power Query</span>
+        </div>
+        <span style="font-size:0.72rem;color:var(--copper);letter-spacing:0.06em;">⧗ PRÓXIMAMENTE</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PIPELINE ──────────────────────────────────────────────────── -->
+<section id="pipeline">
+  <div class="section-inner">
+    <div class="section-header fade-in" style="text-align:center;">
+      <p class="section-eyebrow">arquitectura</p>
+      <h2 class="section-title">Pipeline en acción</h2>
+      <p class="section-sub" style="margin:0 auto;">Output real del ETL Ambiental ejecutándose sobre datos de monitoreo RCA.</p>
+    </div>
+    <div class="terminal-window fade-in">
+      <div class="term-bar">
+        <div class="term-dot td-red"></div>
+        <div class="term-dot td-yellow"></div>
+        <div class="term-dot td-green"></div>
+        <span style="font-size:0.7rem;color:var(--term-muted);margin-left:0.5rem;">pipeline.py — ETL Monitoreo Ambiental RCA</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd">python3 pipeline.py</span></div>
+        <div class="term-spacer"></div>
+        <div class="term-out term-section">══════════════════════════════════════════════</div>
+        <div class="term-out term-section">  ETL PIPELINE — Monitoreo Ambiental RCA</div>
+        <div class="term-out term-section">  Simulación: División Minera Norte, Chile</div>
+        <div class="term-out term-section">══════════════════════════════════════════════</div>
+        <div class="term-spacer"></div>
+        <div class="term-out">[EXTRACT] Leyendo datos de sensores de campo...</div>
+        <div class="term-out term-ok">  ✓ 730 lecturas diarias | 2022-01-01 → 2023-12-31</div>
+        <div class="term-out term-ok">  ✓ Parámetros: pH, turbidez, conductividad, sulfatos, arsénico</div>
+        <div class="term-out term-warn">  ✓ Sensor offline: 20 días (2.7%) detectados</div>
+        <div class="term-spacer"></div>
+        <div class="term-out">[TRANSFORM] Aplicando modelos dbt-style...</div>
+        <div class="term-out term-ok">  ✓ stg_sensor_readings: 710 registros válidos</div>
+        <div class="term-out term-ok">  ✓ mart_monthly_compliance: 24 meses analizados</div>
+        <div class="term-spacer"></div>
+        <div class="term-out">[LOAD] → DuckDB data warehouse...</div>
+        <div class="term-out term-ok">  ✓ stg_sensor_readings → 710 filas cargadas</div>
+        <div class="term-out term-ok">  ✓ mart_monthly_compliance → 24 filas cargadas</div>
+        <div class="term-spacer"></div>
+        <div class="term-out">[ANALYZE] Queries de cumplimiento RCA...</div>
+        <div class="term-out term-warn">  ▸ Meses con excedencia normativa: 2 (ene-feb 2022)</div>
+        <div class="term-out term-ok">  ▸ Causa: turbidez P95 > 10 NTU (lluvias excepcionales)</div>
+        <div class="term-spacer"></div>
+        <div class="term-out term-section">══════════════════════════════════════════════</div>
+        <div class="term-out" style="color:#3FB950;font-weight:700;">  PIPELINE COMPLETADO ✓  |  Cumplimiento RCA: 91.7%</div>
+        <div class="term-out term-section">══════════════════════════════════════════════</div>
+        <div class="term-spacer"></div>
+        <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd" style="opacity:0.4;">_</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SKILLS ────────────────────────────────────────────────────── -->
+<section id="skills">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <p class="section-eyebrow">stack técnico</p>
+      <h2 class="section-title">Skills</h2>
+      <p class="section-sub">Combinación de herramientas de datos modernas con dominio sectorial profundo.</p>
+    </div>
+    <div class="skills-layout">
+      <div>
+        <p class="skill-group-title">// datos & análisis</p>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">Power BI</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="92"></div></div>
+          <span class="skill-pct">92%</span>
+        </div>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">SQL</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="85"></div></div>
+          <span class="skill-pct">85%</span>
+        </div>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">Python · Pandas</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill cyan" data-w="75"></div></div>
+          <span class="skill-pct">75%</span>
+        </div>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">ETL · Snowflake</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill cyan" data-w="78"></div></div>
+          <span class="skill-pct">78%</span>
+        </div>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">SAP PP/CO</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" data-w="82"></div></div>
+          <span class="skill-pct">82%</span>
+        </div>
+      </div>
+      <div>
+        <p class="skill-group-title">// dominio & normativa</p>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">Minería · RCA · SEIA</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill green" data-w="90"></div></div>
+          <span class="skill-pct">90%</span>
+        </div>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">Sensores de campo</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill green" data-w="85"></div></div>
+          <span class="skill-pct">85%</span>
+        </div>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">NCG 519 · IFRS S1-S2</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill green" data-w="45"></div></div>
+          <span class="skill-pct">45%</span>
+        </div>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">QGIS · GIS</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill green" data-w="35"></div></div>
+          <span class="skill-pct">35%</span>
+        </div>
+        <div class="skill-row fade-in">
+          <div class="skill-name-wrap"><span class="skill-name">dbt · pipelines</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill cyan" data-w="40"></div></div>
+          <span class="skill-pct">40%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── EXPERIENCIA ───────────────────────────────────────────────── -->
+<section id="experiencia">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <p class="section-eyebrow">trayectoria</p>
+      <h2 class="section-title">Experiencia</h2>
+      <p class="section-sub">Del terreno minero al pipeline de datos.</p>
+    </div>
+    <div class="exp-grid">
+      <div class="exp-card fade-in">
+        <div class="exp-period">Mar 2023 – Presente</div>
+        <div class="exp-role">Analista de Planificación y Control de la Producción</div>
+        <div class="exp-company"><span class="company-hl">American Screw</span> · Santiago, Chile</div>
+        <ul class="exp-points">
+          <li>Dashboards Power BI conectados a SAP para gerencia de Planificación</li>
+          <li>Pipeline ETL SAP → Power BI que eliminó consolidación manual de reportes</li>
+          <li>Gestión de KPIs de producción y cumplimiento de plazos</li>
+        </ul>
+      </div>
+      <div class="exp-card fade-in">
+        <div class="exp-period">Ago 2022 – Ene 2023</div>
+        <div class="exp-role">Ingeniero de Datos</div>
+        <div class="exp-company"><span class="company-hl">Stratify</span> · Santiago, Chile</div>
+        <ul class="exp-points">
+          <li>ETL multisectorial: Easymorph → Snowflake → Power BI</li>
+          <li>Construcción de data warehouses (staging, marts) para clientes de distintos rubros</li>
+          <li>Reducción de tiempos de carga de horas a minutos</li>
+        </ul>
+      </div>
+      <div class="exp-card featured fade-in">
+        <div class="exp-badge">⛏ Codelco</div>
+        <div class="exp-period">2018 – 2020</div>
+        <div class="exp-role">Supervisor Monitoreo Ambiental</div>
+        <div class="exp-company"><span class="company-hl">CEA / GS3 Consultores</span> · Div. Ministro Hales</div>
+        <ul class="exp-points">
+          <li>Monitoreo ambiental bajo RCA en área protegida altiplano</li>
+          <li>Extracción y análisis de datos de sensores: pH, turbidez, arsénico, flora, fauna</li>
+          <li>Reporting periódico a la SMA — base para reportabilidad NCG 519</li>
+          <li>Automatización de informes de cumplimiento con scripts y tablas dinámicas</li>
+        </ul>
+      </div>
+      <div class="exp-card fade-in">
+        <div class="exp-period">2015 – 2018</div>
+        <div class="exp-role">Especialista de Apoyo — Consultoría Ambiental</div>
+        <div class="exp-company">Consultoría Ambiental · Santiago, Chile</div>
+        <ul class="exp-points">
+          <li>EIA/DIA bajo el Sistema de Evaluación de Impacto Ambiental (SEIA)</li>
+          <li>Levantamiento de línea de base ambiental en terreno</li>
+          <li>Procesamiento y análisis de datos de campo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ───────────────────────────────────────────────────── -->
+<section id="contacto">
+  <div class="section-inner">
+    <div class="contact-inner">
+      <div class="contact-ascii fade-in">
+   ██████╗  █████╗ ████████╗ █████╗ ███████╗
+   ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔════╝
+   ██║  ██║███████║   ██║   ███████║███████╗
+   ██║  ██║██╔══██║   ██║   ██╔══██║╚════██║
+   ██████╔╝██║  ██║   ██║   ██║  ██║███████║
+   ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
+      </div>
+      <h2 class="contact-title fade-in">¿Hablamos?</h2>
+      <p class="contact-sub fade-in">Abierto a posiciones de Data Analyst en minería, industria regulada y sostenibilidad. Santiago, Chile.</p>
+      <div class="contact-links fade-in">
+        <a class="contact-link primary" href="https://www.linkedin.com/in/josemamunoz/" target="_blank">linkedin ↗</a>
+        <a class="contact-link" href="https://github.com/josemamunoz" target="_blank">github ↗</a>
+        <a class="contact-link" href="mailto:josema.munoz@gmail.com">josema.munoz@gmail.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  jose manuel muñoz silva · <span>data analyst</span> · santiago, chile · 2026
+</footer>
+
+<!-- ─── SCRIPTS ────────────────────────────────────────────────────── -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ── Hero chart: Codelco vs Privados stacked bar ──────────────────
+(function() {
+  const years    = [2010,2012,2014,2016,2018,2020,2022,2023];
+  const codelco  = [1420,1380,1520,1460,1550,1430,1380,1360];
+  const privados = [2180,2350,2580,2490,2680,2225,2688,2640];
+
+  const ctx = document.getElementById('heroChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: [
+        { label: 'Codelco',  data: codelco,  backgroundColor: '#A0612A', borderRadius: 3, borderSkipped: false },
+        { label: 'Privados', data: privados, backgroundColor: '#0969DA', borderRadius: 3, borderSkipped: false },
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 1200, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { labels: { color: '#57606A', font: { size: 11, family: 'SF Mono,Fira Code,monospace' }, boxWidth: 10 } },
+        tooltip: {
+          backgroundColor: '#FFFFFF', borderColor: '#D0D7DE', borderWidth: 1,
+          titleColor: '#1F2328', bodyColor: '#57606A',
+          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()} ktm` }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { color: '#EAEEF2' }, ticks: { color: '#57606A', font: { size: 10 } } },
+        y: { stacked: true, grid: { color: '#EAEEF2' }, ticks: { color: '#57606A', font: { size: 10 },
+             callback: v => v.toLocaleString() + ' k' } }
+      }
+    }
+  });
+})();
+
+// ── Scroll animations ────────────────────────────────────────────
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.w + '%';
+      });
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+  bar.style.transition = 'width 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s';
+});
+</script>
+</body>
+</html>
