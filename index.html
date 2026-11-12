@@ -524,6 +524,29 @@ footer span { color: var(--copper); }
       <div class="project-card fade-in">
         <div class="proj-lang">
           <div class="lang-dot lang-python"></div><span style="font-size:0.7rem;color:var(--muted)">Python</span>
+          <div class="lang-dot" style="background:#E34C26;margin-left:0.5rem"></div><span style="font-size:0.7rem;color:var(--muted)">HTML · JS</span>
+        </div>
+        <div class="proj-title">Sustentabilidad Chile · Huella de carbono y emisiones RETC</div>
+        <p class="proj-desc">Dashboards web sin licencias de BI: calculadora de huella de carbono (alcances 1, 2 y 3) con el factor oficial de la CNE y observatorio de CO₂ del RETC con mapa y foco en Mejillones. Detecta declaraciones imposibles en los datos oficiales y se actualiza solo con GitHub Actions.</p>
+        <div class="proj-code"><span class="cm"># calidad de datos RETC</span>
+<span class="cm"># panadería: 18,5 Mt CO₂ ✗</span>
+TOPE = <span class="nu">4_000_000</span>  <span class="cm"># t/año</span>
+ok = co2[co2.t &lt;= TOPE]
+<span class="cm"># 2023: 54 · 2024: 49 Mt</span></div>
+        <div class="proj-tags">
+          <span class="proj-tag">Python</span><span class="proj-tag">Pandas</span>
+          <span class="proj-tag">ECharts</span><span class="proj-tag">Leaflet</span>
+          <span class="proj-tag">GitHub Actions</span><span class="proj-tag">GHG Protocol</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.25rem 1.25rem">
+          <a class="proj-link" href="https://josemamunoz.github.io/medio_ambiente/" target="_blank" rel="noopener">ver sitio →</a>
+          <a class="proj-link" href="https://github.com/josemamunoz/medio_ambiente" target="_blank" rel="noopener">ver repositorio →</a>
+        </div>
+      </div>
+
+      <div class="project-card fade-in">
+        <div class="proj-lang">
+          <div class="lang-dot lang-python"></div><span style="font-size:0.7rem;color:var(--muted)">Python</span>
           <div class="lang-dot lang-sql" style="margin-left:0.5rem"></div><span style="font-size:0.7rem;color:var(--muted)">SQL</span>
         </div>
         <div class="proj-title">Análisis Producción Minera Chile · 1995–2023</div>
